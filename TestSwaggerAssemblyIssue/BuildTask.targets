@@ -1,0 +1,32 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <UsingTask
+            TaskName="BuildTask"
+            TaskFactory="CodeTaskFactory"
+            AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+        <ParameterGroup>
+            <OutputPath ParameterType="System.String" Required="true" />
+            <AssemblyName ParameterType="System.String" Required="true" />
+        </ParameterGroup>
+        <Task>
+            <Using Namespace="System"/>
+            <Using Namespace="System.IO"/>
+            <Using Namespace="System.Reflection"/>
+            <Code Type="Fragment" Language="cs">
+                <![CDATA[
+try {
+    var asm = Assembly.LoadFrom(OutputPath + AssemblyName + ".dll");
+    var types = asm.GetTypes();
+} catch(ReflectionTypeLoadException e) {
+    Log.LogError(e.Message);
+    
+    foreach (var loaderException in e.LoaderExceptions)
+    {
+        Log.LogError(loaderException.Message);
+    }
+}
+]]>
+
+            </Code>
+        </Task>
+    </UsingTask>
+</Project>  
